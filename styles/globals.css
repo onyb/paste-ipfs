@@ -1,3 +1,8 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html,
 body {
   padding: 0;
@@ -13,6 +18,10 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+.textinput{
+  @apply rounded-md border border-blue-500;
 }
 
 @media (prefers-color-scheme: dark) {
