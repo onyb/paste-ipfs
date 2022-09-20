@@ -29,19 +29,20 @@ const Highlighter = () => {
   }, [textfield]);
 
   const getCid = () => {
-    const cid = setTimeout(() => {
+    setTimeout(() => {
       setIpfsHash('a-pretty-long-hash');
+      setUploading(false);
+      let buttonText = document.getElementById('uploadToIpfsButton');
+      buttonText.innerHTML = "+ Add to IPFS";
     }, 5000);
-    console.log('File uploaded with CID ', cid)
-    return cid;
   };
 
   function uploadToIpfs(e) {
     e.preventDefault();
     console.log('Uploading to IPFS...');
+    setUploading(true);
     let buttonText = document.getElementById('uploadToIpfsButton');
     buttonText.innerHTML = "Adding to IPFS...";
-    setUploading(true);
     
     async function upload() {
       try {
@@ -55,11 +56,12 @@ const Highlighter = () => {
         );
         files.push(file);
         // const cid = await storage.put(files);
-        const cid = await getCid();
-        if (cid) {
+        await getCid();
+        if (ipfsHash) {
           setIsIpfsHashCreated(true);
+          console.log("enters if ipfsHash condition...")
           // setIpfsHash(cid);
-          setUploading(false);
+          // setUploading(false);
         }
       } catch (err) {
           console.log(err);
@@ -97,7 +99,7 @@ const Highlighter = () => {
     setCreated(true);
     setIsIpfsHashCreated(false);
     setIpfsHash("");
-    setUploading(false);
+    // setUploading(false);
     let uploadButtonText = document.getElementById('uploadToIpfsButton')
     uploadButtonText.innerHTML = "+ Add to IPFS"
   }
@@ -185,17 +187,17 @@ const Highlighter = () => {
       {/* ready code snippet window here */}
       <div className="w-1/2 flex flex-col justify-center items-center">
         <p className="items-center" style={{visibility: !created && !snippet ? "visible" : "hidden"}}
-        ><strong>Snippet has not been created...</strong><br/> Paste your code on the editor and generate your snippet.
+        ><strong>Waiting for snippet to be generated...</strong><br/> Paste your code on the editor and generate your snippet.
         </p>
         <div className="w-full flex-col items-center" style={{ visibility: created && snippet ? "visible" : "hidden"}}>
-          <p className="w-full items-center" style={{ visibility: !isIpfsHashCreated && snippet ? "visible" : "hidden"}}>
+          <p className="w-full items-center" style={{ visibility: snippet && ipfsHash.length === 0 ? "visible" : "hidden"}}>
           🛸 Awesome! Your snippet is generated. Add the file to IPFS or download it now.
           </p>
-          <p className="items-center" style={{ visibility: snippet &&  ipfsHash  && isIpfsHashCreated ? "visible" : "hidden"}}>
-              🎉 <strong>Bravo! You have uploaded your snippet to IPFS.</strong><br/>Click the link to view your snippet on a new page or copy the CID and view it on an IPFS Gateway.
+          <p className="items-center" style={{ visibility: snippet &&  ipfsHash  ? "visible" : "hidden"}}>
+            🎉 <strong>Bravo! You have uploaded your snippet to IPFS.</strong><br/>Click the link to view your snippet on a new page or copy the CID and view it on an IPFS Gateway.
           </p>
           <div className="flex flex-wrap -mx-3 mb-2">
-            <div className="w-full md:w-2/5 px-3 mb-6 md:mb-0" style={{ visibility: snippet && ipfsHash && !uploading ? "visible" : "hidden"}}>
+            <div className="w-full md:w-2/5 px-3 mb-6 md:mb-0" style={{ visibility: snippet && ipfsHash ? "visible" : "hidden"}}>
               <span
                 className="inline-flex "
                 style={{justifyContent: "flex-start"}}
@@ -216,9 +218,9 @@ const Highlighter = () => {
                 </span>
               </span>
             </div>
-            <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0" style={{ visibility: !isIpfsHashCreated && snippet ? "visible" : "hidden"}}>
+            <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0" style={{ visibility: snippet && ipfsHash.length === 0 ? "visible" : "hidden"}}>
               <button
-                className="bg-transparent hover:bg-blue-500 text-blue-600 disabled:bg-gray-500 font-semibold text-xs hover:text-white py-3 px-4 border border-blue-500 hover:border-transparent rounded"
+                className="shadow bg-blue-500 hover:bg-blue-600 text-white disabled:bg-gray-500 font-semibold text-xs hover:text-white py-3 px-4 border border-blue-400 hover:border-transparent rounded"
                 type="button"
                 style={{justifyContent: "flex-end"}}
                 id="uploadToIpfsButton"
