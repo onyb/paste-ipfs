@@ -29,52 +29,40 @@ const Highlighter = () => {
   }, [textfield]);
 
   const getCid = () => {
-    const cid = setTimeout(() => {
+    setTimeout(() => {
       setIpfsHash('a-pretty-long-hash');
+      setUploading(false);
+      let buttonText = document.getElementById('uploadToIpfsButton');
+      buttonText.innerHTML = "+ Add to IPFS";
     }, 5000);
-    console.log('File uploaded with CID ', cid)
-    return cid;
   };
-
-  useEffect(() => {
-    async function checkUpload() {
-      try {
-        const res = await getCid(); 
-        setIpfsHash(res);
-        isIpfsHashCreated(true);
-        setUploading(false)
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  checkUpload();
-  }, [snippet]);
 
   function uploadToIpfs(e) {
     e.preventDefault();
     console.log('Uploading to IPFS...');
-    let buttonText = document.getElementById('uploadToIpfsButton')
-    buttonText.innerHTML = "Adding to IPFS..."
     setUploading(true);
+    let buttonText = document.getElementById('uploadToIpfsButton');
+    buttonText.innerHTML = "Adding to IPFS...";
     
     async function upload() {
       try {
         // const storage = new Web3Storage({token})
-        const files = []
+        const files = [];
         const file = new Blob(
           [snippet],
           {
             type: "text/plain;charset=utf-8"
           }
         );
-        files.push(file)
+        files.push(file);
         // const cid = await storage.put(files);
-        const cid = await getCid();
-        if (cid) {
+        await getCid();
+        if (ipfsHash) {
           setIsIpfsHashCreated(true);
+          console.log("enters if ipfsHash condition...")
           // setIpfsHash(cid);
-          setUploading(false);
-        } 
+          // setUploading(false);
+        }
       } catch (err) {
           console.log(err);
       }
@@ -109,6 +97,11 @@ const Highlighter = () => {
     let buttonText = document.getElementById('createSnippetButton')
     buttonText.innerHTML = "Created!"
     setCreated(true);
+    setIsIpfsHashCreated(false);
+    setIpfsHash("");
+    // setUploading(false);
+    let uploadButtonText = document.getElementById('uploadToIpfsButton')
+    uploadButtonText.innerHTML = "+ Add to IPFS"
   }
 
   function downloadSnippetAsFile(e) {
@@ -193,18 +186,18 @@ const Highlighter = () => {
       </div>
       {/* ready code snippet window here */}
       <div className="w-1/2 flex flex-col justify-center items-center">
-        <p className="items-center" style={{visibility: !created || !snippet ? "visible" : "hidden"}}
-        ><strong>Snippet has not been created...</strong><br/> Paste your code on the editor and generate your snippet.
+        <p className="items-center" style={{visibility: !created && !snippet ? "visible" : "hidden"}}
+        ><strong>Waiting for snippet to be generated...</strong><br/> Paste your code on the editor and generate your snippet.
         </p>
         <div className="w-full flex-col items-center" style={{ visibility: created && snippet ? "visible" : "hidden"}}>
-          <p className="w-full items-center" style={{ visibility: !isIpfsHashCreated && snippet &&  created ? "visible" : "hidden"}}>
+          <p className="w-full items-center" style={{ visibility: snippet && ipfsHash.length === 0 ? "visible" : "hidden"}}>
           🛸 Awesome! Your snippet is generated. Add the file to IPFS or download it now.
           </p>
-          <p className="items-center" style={{ visibility: snippet &&  isIpfsHashCreated ? "visible" : "hidden"}}>
-              🎉 <strong>Bravo! You have uploaded your snippet to IPFS.</strong><br/>Click the link to view your snippet on a new page or copy the CID and view it on an IPFS Gateway.
+          <p className="items-center" style={{ visibility: snippet &&  ipfsHash  ? "visible" : "hidden"}}>
+            🎉 <strong>Bravo! You have uploaded your snippet to IPFS.</strong><br/>Click the link to view your snippet on a new page or copy the CID and view it on an IPFS Gateway.
           </p>
           <div className="flex flex-wrap -mx-3 mb-2">
-            <div className="w-full md:w-2/5 px-3 mb-6 md:mb-0" style={{ visibility: snippet && isIpfsHashCreated && !uploading ? "visible" : "hidden"}}>
+            <div className="w-full md:w-2/5 px-3 mb-6 md:mb-0" style={{ visibility: snippet && ipfsHash ? "visible" : "hidden"}}>
               <span
                 className="inline-flex "
                 style={{justifyContent: "flex-start"}}
@@ -212,7 +205,6 @@ const Highlighter = () => {
                 <a className="font-bold text-md text-blue-400 hover:text-blue-600"
                   href="https://adybose.github.io"
                   target="_blank"
-                  onClick={()=>{swal("IPFS hash copied successfully")}}
                   // view 
                 >
                   {ipfsHash}
@@ -226,19 +218,19 @@ const Highlighter = () => {
                 </span>
               </span>
             </div>
-            <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0" style={{ visibility: !isIpfsHashCreated && snippet &&  created ? "visible" : "hidden"}}>
+            <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0" style={{ visibility: snippet && ipfsHash.length === 0 ? "visible" : "hidden"}}>
               <button
-                className="bg-transparent hover:bg-blue-500 text-blue-600 disabled:bg-gray-500 font-semibold text-xs hover:text-white py-3 px-4 border border-blue-500 hover:border-transparent rounded"
+                className="shadow bg-blue-500 hover:bg-blue-600 text-white disabled:bg-gray-500 font-semibold text-xs hover:text-white py-3 px-4 border border-blue-400 hover:border-transparent rounded"
                 type="button"
                 style={{justifyContent: "flex-end"}}
                 id="uploadToIpfsButton"
                 value=""
-                disabled={uploading && isIpfsHashCreated}
+                disabled={uploading}
                 onClick={uploadToIpfs}>
                   + Add to IPFS
               </button>
             </div>
-            <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0" style={{ visibility: snippet && ipfsHash ? "visible" : "hidden", display: "flex"}}>
+            <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0" style={{ visibility: snippet ? "visible" : "hidden", display: "flex"}}>
               <CopyToClipboard text={snippet}>
                 <button
                   className="bg-transparent hover:bg-blue-500 text-blue-600 font-semibold text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
@@ -252,7 +244,7 @@ const Highlighter = () => {
               <button
                 className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold text-xs py-3 px-4 rounded inline-flex items-center"
                 id="downloadSnippetButton"
-                style={{marginRight: "auto"}}
+                style={{visibility: snippet ? "visible" : "hidden", marginRight: "auto"}}
                 onClick={downloadSnippetAsFile}>
                   <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
                     <span>Download</span>
