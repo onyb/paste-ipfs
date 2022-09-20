@@ -31,7 +31,7 @@ export default function Home() {
           >
             © 2022 Aditya Bose
           </a>
-          Made with ❤️ in India
+          Made with ❤️ in India 🇮🇳
         </span>
       </footer>
     </div>
