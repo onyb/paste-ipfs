@@ -28,39 +28,53 @@ const Highlighter = () => {
     setActive(active);
   }, [textfield]);
 
-  const checkIfUploaded = () => {
-    // const storage = new Web3Storage({token})
-    const files = []
-    const file = new Blob(
-      [snippet],
-      {
-        type: "text/plain;charset=utf-8"
-      }
-    );
-    files.push(file)
-    // const cid = await storage.put(files);
+  const getCid = () => {
     const cid = setTimeout(() => {
       setIpfsHash('a-pretty-long-hash');
-    }, 1000);
+    }, 5000);
     console.log('File uploaded with CID ', cid)
     return cid;
   };
 
-  useEffect( () => { 
-    async function checkUploading() {
-        try {
-            const uploaded = await checkIfUploaded();
-            if (uploaded) {
-              setIsIpfsHashCreated(true);
-              // setIpfsHash(hash);
-              setUploading(false);
-            } 
-        } catch (err) {
-            console.log(err);
-        }
+  useEffect(() => {
+    async function checkUpload() {
+      try {
+        const res = await getCid(); 
+        setIpfsHash(res);
+        isIpfsHashCreated(true);
+        setUploading(false)
+      } catch (err) {
+        console.log(err);
+      }
     }
-    checkUploading();
+  checkUpload();
   }, [snippet]);
+
+  // useEffect( () => { 
+  //   async function getCid() {
+  //       try {
+  //         // const storage = new Web3Storage({token})
+  //         const files = []
+  //         const file = new Blob(
+  //           [snippet],
+  //           {
+  //             type: "text/plain;charset=utf-8"
+  //           }
+  //         );
+  //         files.push(file)
+  //         // const cid = await storage.put(files);
+  //         const uploaded = await checkIfUploaded();
+  //           if (uploaded) {
+  //             setIsIpfsHashCreated(true);
+  //             // setIpfsHash(hash);
+  //             setUploading(false);
+  //           } 
+  //       } catch (err) {
+  //           console.log(err);
+  //       }
+  //   }
+  //   getCid();
+  // }, [snippet]);
 
   function uploadToIpfs(e) {
     e.preventDefault();
@@ -68,7 +82,31 @@ const Highlighter = () => {
     let buttonText = document.getElementById('uploadToIpfsButton')
     buttonText.innerHTML = "Adding to IPFS..."
     setUploading(true);
-  }
+    
+    async function upload() {
+      try {
+        // const storage = new Web3Storage({token})
+        const files = []
+        const file = new Blob(
+          [snippet],
+          {
+            type: "text/plain;charset=utf-8"
+          }
+        );
+        files.push(file)
+        // const cid = await storage.put(files);
+        const cid = await getCid();
+        if (cid) {
+          setIsIpfsHashCreated(true);
+          // setIpfsHash(cid);
+          setUploading(false);
+        } 
+      } catch (err) {
+          console.log(err);
+      }
+    }
+    upload();
+    }
 
   const handleInputChange = (e) => {
     setTextField(e.target.value);
@@ -182,13 +220,12 @@ const Highlighter = () => {
       {/* ready code snippet window here */}
       <div className="w-1/2 flex flex-col justify-center items-center">
         <p className="items-center" style={{visibility: !created || !snippet ? "visible" : "hidden"}}
-        >Snippet Not Created...<br/> Paste your code on the editor on the left and generate your snippet.
+        ><strong>Snippet has not been created...</strong><br/> Paste your code on the editor and generate your snippet.
         </p>
-        <div className="w-11/12 flex-col items-center" style={{ visibility: created && snippet ? "visible" : "hidden"}}>
-          <p className="items-center" style={{ visibility: !isIpfsHashCreated && snippet &&  created ? "visible" : "hidden"}}>
+        <div className="w-full flex-col items-center" style={{ visibility: created && snippet ? "visible" : "hidden"}}>
+          <p className="w-full items-center" style={{ visibility: !isIpfsHashCreated && snippet &&  created ? "visible" : "hidden"}}>
           🛸 Awesome! Your snippet is generated. Add the file to IPFS or download it now.
           </p>
-          <br/>
           <div className="flex flex-wrap -mx-3 mb-2">
             <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0" style={{ visibility: !isIpfsHashCreated && snippet &&  created ? "visible" : "hidden"}}>
               <button
