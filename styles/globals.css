@@ -21,7 +21,8 @@ a {
 }
 
 .textinput{
-  @apply rounded-md border border-blue-500;
+  width: 100%;
+  @apply rounded-md border border-gray-300;
 }
 
 @media (prefers-color-scheme: dark) {
