@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from "react";
+import AceEditor from "react-ace";
 import {FaCopy} from "react-icons/fa";
 import CopyToClipboard from "react-copy-to-clipboard";
 import SyntaxHighlighter from "react-syntax-highlighter";
@@ -7,6 +8,54 @@ import swal from 'sweetalert';
 
 import styles from '../styles/Home.module.css'
 
+if (typeof window !== "undefined") {
+  require("ace-builds/src-noconflict/mode-jsx")
+}
+
+
+const languages = [
+  "javascript",
+  "java",
+  "python",
+  "xml",
+  "ruby",
+  "sass",
+  "markdown",
+  "mysql",
+  "json",
+  "html",
+  "handlebars",
+  "golang",
+  "csharp",
+  "elixir",
+  "typescript",
+  "css"
+];
+
+const themes = [
+  "monokai",
+  "github",
+  "tomorrow",
+  "kuroir",
+  "twilight",
+  "xcode",
+  "textmate",
+  "solarized_dark",
+  "solarized_light",
+  "terminal"
+];
+
+if (typeof window !== "undefined") {
+  languages.forEach(lang => {
+    require(`ace-builds/src-noconflict/mode-${lang}`);
+    require(`ace-builds/src-noconflict/snippets/${lang}`);
+  })
+
+  themes.forEach(theme => require(`ace-builds/src-noconflict/theme-${theme}`));
+  /*eslint-disable no-alert, no-console */
+  require("ace-builds/src-min-noconflict/ext-searchbox")
+  require("ace-builds/src-min-noconflict/ext-language_tools")
+}
 
 const Highlighter = () => {
   const [selectvalue, setSelectValue] = useState("");
@@ -32,8 +81,8 @@ const Highlighter = () => {
     setTimeout(() => {
       setIpfsHash('a-pretty-long-hash');
       setUploading(false);
-      let buttonText = document.getElementById('uploadToIpfsButton');
-      buttonText.innerHTML = "+ Add to IPFS";
+      // let buttonText = document.getElementById('uploadToIpfsButton');
+      // buttonText.innerHTML = "+ Add to IPFS";
     }, 5000);
   };
 
@@ -41,6 +90,7 @@ const Highlighter = () => {
     e.preventDefault();
     console.log('Uploading to IPFS...');
     setUploading(true);
+    setActive(false);
     let buttonText = document.getElementById('uploadToIpfsButton');
     buttonText.innerHTML = "Adding to IPFS...";
     
@@ -70,17 +120,20 @@ const Highlighter = () => {
     upload();
     }
 
-  const handleInputChange = (e) => {
-    setTextField(e.target.value);
+  const handleInputChange = (code) => {
+    setTextField(code);
     let buttonText = document.getElementById('createSnippetButton')
     buttonText.innerHTML = "Create"
-    if (e.target.value.length === 0 || e.target.value.length !== snippet.length) {
-      setCreated(false);
-    }
+    // if (e.target.value.length === 0 || e.target.value.length !== snippet.length) {
+    //   setCreated(false);
+    // }
+    // if (e.target.value.length === 0) {
+    //   setCreated(false);
+    // }
   };
 
   const handleSelect = (e) => {
-    setSelectValue(e.target.value);
+    setSelectValue(e.target.value.toLowerCase());
     let buttonText = document.getElementById('createSnippetButton')
     buttonText.innerHTML = "Create"
   };
@@ -100,8 +153,8 @@ const Highlighter = () => {
     setIsIpfsHashCreated(false);
     setIpfsHash("");
     // setUploading(false);
-    let uploadButtonText = document.getElementById('uploadToIpfsButton')
-    uploadButtonText.innerHTML = "+ Add to IPFS"
+    // let uploadButtonText = document.getElementById('uploadToIpfsButton')
+    // uploadButtonText.innerHTML = "+ Add to IPFS"
   }
 
   function downloadSnippetAsFile(e) {
@@ -124,77 +177,18 @@ const Highlighter = () => {
   }
 
   return (
-    <div className=" container flex h-screen flex-row">
-      <div className="h-full w-1/2 flex pt-14 flex-col px-6 text-center">
-
-        {/* form container here */}
-        <label class="block flex tracking-wide text-gray-700 text-md mb-2" for="snippet-language-select">
-          Select a language to generate syntax highlighting for your Paste
-        </label>
-        <select
-          // input field for language name
-          className=" px-2 py-3 text-gray-700 bg-gray-300 outline-none textinput w-full mb-20"
-          placeholder="Enter Language"
-          id="snippet-language-select"
-          value={selectvalue}
-          onChange={handleSelect}
-        >
-          <option>Javascript</option>
-          <option>CSS</option>
-          <option>HTML</option>
-          <option>TypeScript</option>
-          <option>C++</option>
-        </select>
-       
-        <textarea
-          // text field for code
-          className=" px-4 py-5 textinput w-full relative h-3/4 outline-none bg-gray-300 appearance-none text-gray-700 leading-tight focus:outline-none focus:bg-gray-100 focus:border-gray-400"
-          placeholder="Paste your snippet here and click on Create to generate your IPFS link..."
-          value={textfield}
-          onChange={handleInputChange}
-        />
-        <div className={styles.createfilegrid}>
-        <form className="w-full max-w flex">
-          <div className="flex mb-6">
-            <div className="w-full md:w-3/4 flex">
-              <label class="block flex tracking-wide text-gray-700 text-md mb-2" for="inline-file-name">
-                Enter a name for your Paste (Optional)
-              </label>
-              <input
-                className="px-4 py-2 textinput bg-gray-300 outline-none rounded text-gray-600 leading-tight focus:outline-none focus:bg-gray-200 focus:border-gray-300"
-                id="inline-file-name"
-                type="text"
-                value={filename}
-                onChange={handleFileInput}
-                placeholder="Enter a name for your Paste..."
-              />
-            </div>
-            <div className="md:w-1/4">
-              <button
-                className="shadow bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 focus:shadow-outline focus:outline-none text-white font-bold py-4 px-10 rounded"
-                type="button"
-                id="createSnippetButton"
-                value=""
-                disabled={!active}
-                onClick={createSnippet}
-              >Create</button>
-            </div>
-          </div>
-        </form>
-
-        </div>   
-      </div>
+    <div className=" container flex-col h-screen">
       {/* ready code snippet window here */}
-      <div className="w-1/2 flex flex-col justify-center items-center">
-        <p className="items-center" style={{visibility: !created && !snippet ? "visible" : "hidden"}}
-        ><strong>Waiting for snippet to be generated...</strong><br/> Paste your code on the editor and generate your snippet.
+      <div className="w-full flex flex-col justify-center items-center">
+        <p className="items-center" style={{visibility: !created && !snippet ? "visible" : "hidden"}}>
+          <strong>Paste not created. Create now</strong>
         </p>
         <div className="w-full flex-col items-center" style={{ visibility: created && snippet ? "visible" : "hidden"}}>
           <p className="w-full items-center" style={{ visibility: snippet && ipfsHash.length === 0 ? "visible" : "hidden"}}>
-          🛸 Awesome! Your snippet is generated. Add the file to IPFS or download it now.
+          🛸 Awesome! Your snippet is created and is being uploaded to IPFS. Please wait...
           </p>
           <p className="items-center" style={{ visibility: snippet &&  ipfsHash  ? "visible" : "hidden"}}>
-            🎉 <strong>Bravo! You have uploaded your snippet to IPFS.</strong><br/>Click the link to view your snippet on a new page or copy the CID and view it on an IPFS Gateway.
+            🎉 <strong>Bravo! You have uploaded your snippet to IPFS.</strong><br/>Your CID is:
           </p>
           <div className="flex flex-wrap -mx-3 mb-2">
             <div className="w-full md:w-2/5 px-3 mb-6 md:mb-0" style={{ visibility: snippet && ipfsHash ? "visible" : "hidden"}}>
@@ -218,50 +212,94 @@ const Highlighter = () => {
                 </span>
               </span>
             </div>
-            <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0" style={{ visibility: snippet && ipfsHash.length === 0 ? "visible" : "hidden"}}>
-              <button
-                className="shadow bg-blue-500 hover:bg-blue-600 text-white disabled:bg-gray-500 font-semibold text-xs hover:text-white py-3 px-4 border border-blue-400 hover:border-transparent rounded"
-                type="button"
-                style={{justifyContent: "flex-end"}}
-                id="uploadToIpfsButton"
-                value=""
-                disabled={uploading}
-                onClick={uploadToIpfs}>
-                  + Add to IPFS
-              </button>
-            </div>
-            <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0" style={{ visibility: snippet ? "visible" : "hidden", display: "flex"}}>
-              <CopyToClipboard text={snippet}>
-                <button
-                  className="bg-transparent hover:bg-blue-500 text-blue-600 font-semibold text-xs hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
-                  style={{marginLeft: "auto"}}
-                  onClick={()=>{swal("Code snippet copied successfully")}}>
-                    Copy Snippet
-                </button>
-              </CopyToClipboard>
-            </div>
-            <div className="w-full md:w-1/5 px-3 mb-6 md:mb-0">
-              <button
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold text-xs py-3 px-4 rounded inline-flex items-center"
-                id="downloadSnippetButton"
-                style={{visibility: snippet ? "visible" : "hidden", marginRight: "auto"}}
-                onClick={downloadSnippetAsFile}>
-                  <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
-                    <span>Download</span>
-              </button>
-            </div>
           </div>
         </div>
-
-        <div className={styles.largegrid} style={{ visibility: created || snippet ? "visible" : "hidden"}}>
-          <div className="w-full">
-            <SyntaxHighlighter language={selectvalue} style={docco}>
-              {/* pass in code here */}
-              {snippet}
-            </SyntaxHighlighter>
-          </div> 
-        </div>
       </div>
+
+      {/* New form */}
+      <form className="w-full flex flex-col justify-center items-center">
+        <div className="flex flex-wrap -mx-3 mb-2 w-2/3 items-end">
+          <div className="lg:w-1/3 md:w-1/3 sm-w-full px-3 mb-6 md:mb-0">
+            <label className="block tracking-wide text-gray-700 text-xs font-bold mb-2" for="snippet-language-select">
+              Select Language of your Paste
+            </label>
+            <div className="relative">
+              <select
+                className="block appearance-none w-full bg-gray-200 border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-gray-100 focus:border-gray-400"
+                id="snippet-language-select"
+                value={selectvalue}
+                onChange={handleSelect}>
+                <option>CSharp</option>
+                <option>CSS</option>
+                <option>Elixir</option>
+                <option>Golang</option>
+                <option>Handlebars</option>
+                <option>HTML</option>
+                <option>Java</option>
+                <option>JavaScript</option>
+                <option>JSON</option>
+                <option>Markdown</option>
+                <option>MySQL</option>
+                <option>Python</option>
+                <option>Ruby</option>
+                <option>Sass</option>
+                <option>TypeScript</option>
+                <option>XML</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+              </div>
+            </div>
+          </div>
+          <div className="lg:w-1/3 md:w-1/2 sm:w-full px-3 mb-6 md:mb-0">
+            <label className="block tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="inline-file-name">
+              Enter a filename (optional)
+            </label>
+            <input
+              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-gray-100 focus:border-gray-400"
+              id="inline-file-name"
+              type="text"
+              value={filename}
+              onChange={handleFileInput}
+              placeholder="Enter a name for your Paste..."
+            />
+          </div>
+          <div className="lg:w-1/4 md:w-1/3 sm:w-full px-3 mb-6 md:mb-0 flex items-end items-center">
+            <button
+              className="shadow bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 focus:shadow-outline focus:outline-none text-white font-bold py-3 px-10 rounded"
+              type="button"
+              id="createSnippetButton"
+              value=""
+              disabled={!active}
+              onClick={createSnippet}
+            >Create</button>
+          </div>
+        </div>
+      </form>
+      
+      <div className="flex justify-center h-screen">
+        <AceEditor
+          mode={selectvalue}
+          theme="github"
+          onChange={handleInputChange}
+          name="aceEditor"
+          style={{
+            height: '80vh',
+            width: '80%',
+          }}
+          value={textfield}
+          fontSize={18}
+          showPrintMargin={true}
+          showGutter={true}
+          highlightActiveLine={true}
+          setOptions={{
+            enableSnippets: false,
+            showLineNumbers: true,
+            tabSize: 4,
+          }}
+        />
+      </div>
+      
     </div>
   );
 };

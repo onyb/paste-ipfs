@@ -1,16 +1,16 @@
+import styles from '../styles/Home.module.css'
+
+
 const Footer = () => {
-    return (
-        <footer className={styles.footer}>
-          <span>
-          © 2022 Aditya Bose
-          <a
-          href="https://adybose.github.io"
-        >
-          Made with ❤️ in India
-        </a>
-          </span>
-      </footer>
-    )
+  return (
+      <footer className={styles.footer}>
+        <a
+        href="https://adybose.github.io"
+      >
+        © 2022 Made with ❤️ in India
+      </a>
+    </footer>
+  )
 };
 
 export default Footer;

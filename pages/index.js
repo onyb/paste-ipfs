@@ -3,6 +3,7 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 // import Link from 'next/link'
 import Highlighter from '../components/Highlighter'
+import Footer from '../components/Footer'
 
 
 export default function Home() {
@@ -24,16 +25,7 @@ export default function Home() {
         <Highlighter/>     
       </main>
       
-      <footer className={styles.footer}>
-        <span>
-          <a
-          href="https://twitter.com/adybose"
-          >
-            © 2022 Aditya Bose
-          </a>
-          Made with ❤️ in India 🇮🇳
-        </span>
-      </footer>
+      <Footer/>
     </div>
   )
 }
