@@ -1,6 +1,5 @@
-import Highlighter from "../components/Highlighter";
+import Highlighter from '../components/Highlighter'
 
-
-export default function Paste() {
-    return <Highlighter />
+export default function Paste () {
+  return <Highlighter />
 }
