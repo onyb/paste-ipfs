@@ -1,17 +1,32 @@
 import React, {useEffect, useState} from "react";
-import AceEditor from "react-ace";
+import dynamic from 'next/dynamic';
+
+// import AceEditor from "react-ace";
 import {FaCopy} from "react-icons/fa";
 import CopyToClipboard from "react-copy-to-clipboard";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
+// import SyntaxHighlighter from "react-syntax-highlighter";
+// import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import swal from 'sweetalert';
 
-import styles from '../styles/Home.module.css'
+// import styles from '../styles/Home.module.css'
 
-if (typeof window !== "undefined") {
-  require("ace-builds/src-noconflict/mode-jsx")
-}
+// if (typeof window !== "undefined") {
+//   require("ace-builds/src-noconflict/mode-jsx")
+// }
 
+const Ace = dynamic(
+  async () => {
+    const ace = await import('react-ace');
+    require('ace-builds/src-noconflict/mode-javascript');
+    require('ace-builds/src-noconflict/theme-monokai');
+    return ace;
+  },
+{
+  loading: () => (
+    <>Loading...</>
+  ),
+  ssr: false,
+})
 
 const languages = [
   "javascript",
@@ -45,17 +60,17 @@ const themes = [
   "terminal"
 ];
 
-if (typeof window !== "undefined") {
-  languages.forEach(lang => {
-    require(`ace-builds/src-noconflict/mode-${lang}`);
-    require(`ace-builds/src-noconflict/snippets/${lang}`);
-  })
+// if (typeof window !== "undefined") {
+//   languages.forEach(lang => {
+//     require(`ace-builds/src-noconflict/mode-${lang}`);
+//     require(`ace-builds/src-noconflict/snippets/${lang}`);
+//   })
 
-  themes.forEach(theme => require(`ace-builds/src-noconflict/theme-${theme}`));
-  /*eslint-disable no-alert, no-console */
-  require("ace-builds/src-min-noconflict/ext-searchbox")
-  require("ace-builds/src-min-noconflict/ext-language_tools")
-}
+//   themes.forEach(theme => require(`ace-builds/src-noconflict/theme-${theme}`));
+//   /*eslint-disable no-alert, no-console */
+//   require("ace-builds/src-min-noconflict/ext-searchbox")
+//   require("ace-builds/src-min-noconflict/ext-language_tools")
+// }
 
 const Highlighter = () => {
   const [selectvalue, setSelectValue] = useState("");
@@ -278,11 +293,11 @@ const Highlighter = () => {
       </form>
       
       <div className="flex justify-center h-screen">
-        <AceEditor
-          mode={selectvalue}
-          theme="github"
+        <Ace
+          mode="javascript"
+          theme="monokai"
           onChange={handleInputChange}
-          name="aceEditor"
+          name="acode-editor"
           style={{
             height: '80vh',
             width: '80%',

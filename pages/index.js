@@ -6,7 +6,7 @@ import Footer from '../components/Footer'
 import dynamic from 'next/dynamic'
 
 const DynamicComponentWithNoSSR = dynamic(
-  () => import('../components/Highlighter'),
+  () => require('../components/Highlighter'),
   { ssr: false }
 )
 
