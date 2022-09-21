@@ -1,7 +1,10 @@
 import Head from 'next/head'
-import styles from '../styles/Home.module.css'
-import Highlighter from '../components/Highlighter'
+import dynamic from 'next/dynamic'
+
 import Footer from '../components/Footer'
+import styles from '../styles/Home.module.css'
+
+const Highlighter = dynamic(import('../components/Highlighter'), { ssr: false })
 
 export default function Home () {
   return (

@@ -1,61 +1,13 @@
 import React from 'react'
-import AceEditor from 'react-ace'
+import AceEditor from 'react-ace-editor'
 import { FaCopy } from 'react-icons/fa'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import swal from 'sweetalert'
 
 import '../styles/Home.module.css'
-
-if (typeof window !== 'undefined') {
-  require('ace-builds/src-noconflict/mode-jsx')
-}
-
-const languages = [
-  'javascript',
-  'java',
-  'python',
-  'xml',
-  'ruby',
-  'sass',
-  'markdown',
-  'mysql',
-  'json',
-  'html',
-  'handlebars',
-  'golang',
-  'csharp',
-  'elixir',
-  'typescript',
-  'css'
-]
-
-const themes = [
-  'monokai',
-  'github',
-  'tomorrow',
-  'kuroir',
-  'twilight',
-  'xcode',
-  'textmate',
-  'solarized_dark',
-  'solarized_light',
-  'terminal'
-]
-
-if (typeof window !== 'undefined') {
-  languages.forEach(lang => {
-    require(`ace-builds/src-noconflict/mode-${lang}`)
-    require(`ace-builds/src-noconflict/snippets/${lang}`)
-  })
-
-  themes.forEach(theme => require(`ace-builds/src-noconflict/theme-${theme}`))
-  /*eslint-disable no-alert, no-console */
-  require('ace-builds/src-min-noconflict/ext-searchbox')
-  require('ace-builds/src-min-noconflict/ext-language_tools')
-}
+import modes from '../constants/modes'
 
 const Highlighter = () => {
-  const [selectvalue, setSelectValue] = React.useState('')
   const [textfield, setTextField] = React.useState('')
   const [filename, setFileName] = React.useState('')
   const [active, setActive] = React.useState(false)
@@ -64,10 +16,13 @@ const Highlighter = () => {
   const [uploading, setUploading] = React.useState(false)
   const [ipfsHash, setIpfsHash] = React.useState('')
   const [isIpfsHashCreated, setIsIpfsHashCreated] = React.useState(false)
+  const ace = React.useRef(undefined)
 
   const validate = () => {
     return textfield.length
   }
+
+  const mode = new URL(window.location).searchParams.get('mode') ?? 'javascript'
 
   React.useEffect(() => {
     const active = validate()
@@ -240,25 +195,16 @@ const Highlighter = () => {
               <select
                 className='block appearance-none w-full bg-gray-200 border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-gray-100 focus:border-gray-400'
                 id='snippet-language-select'
-                value={selectvalue}
-                onChange={handleSelect}
+                onChange={e => {
+                  window.location.href = `/?mode=${e.target.value}`
+                }}
+                value={mode}
               >
-                <option>CSharp</option>
-                <option>CSS</option>
-                <option>Elixir</option>
-                <option>Golang</option>
-                <option>Handlebars</option>
-                <option>HTML</option>
-                <option>Java</option>
-                <option>JavaScript</option>
-                <option>JSON</option>
-                <option>Markdown</option>
-                <option>MySQL</option>
-                <option>Python</option>
-                <option>Ruby</option>
-                <option>Sass</option>
-                <option>TypeScript</option>
-                <option>XML</option>
+                {modes.map(each => (
+                  <option key={each.value} value={each.value}>
+                    {each.value}
+                  </option>
+                ))}
               </select>
               <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
                 <svg
@@ -304,24 +250,11 @@ const Highlighter = () => {
 
       <div className='flex justify-center h-screen'>
         <AceEditor
-          mode={selectvalue}
-          theme='github'
-          onChange={handleInputChange}
-          name='aceEditor'
-          style={{
-            height: '80vh',
-            width: '80%'
-          }}
-          value={textfield}
-          fontSize={18}
-          showPrintMargin={true}
-          showGutter={true}
-          highlightActiveLine={true}
-          setOptions={{
-            enableSnippets: false,
-            showLineNumbers: true,
-            tabSize: 4
-          }}
+          mode={mode}
+          theme='monokai'
+          setReadOnly={false}
+          style={{ height: '400px', width: '80%' }}
+          ref={ace}
         />
       </div>
     </div>
