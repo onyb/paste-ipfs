@@ -1,13 +1,14 @@
 import React from 'react'
-import AceEditor from 'react-ace-editor'
 import { FaCopy } from 'react-icons/fa'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import swal from 'sweetalert'
 
 import '../styles/Home.module.css'
 import modes from '../constants/modes'
+import AceEditor from './editor'
 
 const Highlighter = () => {
+  const [selectedMode, setSelectedMode] = React.useState('javascript')
   const [textfield, setTextField] = React.useState('')
   const [filename, setFileName] = React.useState('')
   const [active, setActive] = React.useState(false)
@@ -21,8 +22,6 @@ const Highlighter = () => {
   const validate = () => {
     return textfield.length
   }
-
-  const mode = new URL(window.location).searchParams.get('mode') ?? 'javascript'
 
   React.useEffect(() => {
     const active = validate()
@@ -124,14 +123,7 @@ const Highlighter = () => {
 
   return (
     <div className=' container flex-col h-screen'>
-      {/* ready code snippet window here */}
       <div className='w-full flex flex-col justify-center items-center'>
-        <p
-          className='items-center'
-          style={{ visibility: !created && !snippet ? 'visible' : 'hidden' }}
-        >
-          <strong>Paste not created. Create now</strong>
-        </p>
         <div
           className='w-full flex-col items-center'
           style={{ visibility: created && snippet ? 'visible' : 'hidden' }}
@@ -195,10 +187,8 @@ const Highlighter = () => {
               <select
                 className='block appearance-none w-full bg-gray-200 border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-gray-100 focus:border-gray-400'
                 id='snippet-language-select'
-                onChange={e => {
-                  window.location.href = `/?mode=${e.target.value}`
-                }}
-                value={mode}
+                onChange={e => setSelectedMode(e.target.value)}
+                value={selectedMode}
               >
                 {modes.map(each => (
                   <option key={each.value} value={each.value}>
@@ -250,7 +240,7 @@ const Highlighter = () => {
 
       <div className='flex justify-center h-screen'>
         <AceEditor
-          mode={mode}
+          mode={selectedMode}
           theme='monokai'
           setReadOnly={false}
           style={{ height: '400px', width: '80%' }}

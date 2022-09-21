@@ -16,7 +16,7 @@ export default function Home () {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>PasteIPFS</h1>
+        <h1 className={styles.header}>Paste IPFS</h1>
         <h3 className={styles.description}>Share code snippets on the Interplanetary Web</h3>
         <Highlighter />
       </main>
