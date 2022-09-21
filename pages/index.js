@@ -1,9 +1,14 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-// import Link from 'next/link'
 import Highlighter from '../components/Highlighter'
 import Footer from '../components/Footer'
+
+import dynamic from 'next/dynamic'
+
+const DynamicComponentWithNoSSR = dynamic(
+  () => import('../components/Highlighter'),
+  { ssr: false }
+)
 
 
 export default function Home() {
@@ -17,12 +22,12 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          PasteIPFS
+          Paste2IPFS
         </h1>
         <h3 className={styles.description}>
           Share code snippets on the Interplanetary Web
         </h3>
-        <Highlighter/>     
+        <DynamicComponentWithNoSSR />
       </main>
       
       <Footer/>

@@ -91,8 +91,8 @@ const Highlighter = () => {
     console.log('Uploading to IPFS...');
     setUploading(true);
     setActive(false);
-    let buttonText = document.getElementById('uploadToIpfsButton');
-    buttonText.innerHTML = "Adding to IPFS...";
+    // let buttonText = document.getElementById('uploadToIpfsButton');
+    // buttonText.innerHTML = "Adding to IPFS...";
     
     async function upload() {
       try {
