@@ -2,6 +2,7 @@ import React from 'react'
 import { FaCopy } from 'react-icons/fa'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import swal from 'sweetalert'
+import { v4 as uuid } from 'uuid'
 
 import '../styles/Home.module.css'
 import modes from '../constants/modes'
@@ -29,7 +30,7 @@ const Home = () => {
     const value = ace.current.editor.getValue()
     const response = await axios.post(`/api/ipfs`, {
       content: value,
-      filename: trimmedFilename,
+      filename: trimmedFilename || uuid().slice(0, 8),
       extension
     })
     setUploading(false)
