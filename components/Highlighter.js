@@ -7,6 +7,16 @@ import swal from 'sweetalert';
 
 import styles from '../styles/Home.module.css'
 
+const { Web3Storage, getFilesFromPath } = require('web3.storage')
+
+function getAccessToken () {
+// return 'ACCESS_TOKEN'}
+
+function makeStorageClient () {
+  return new Web3Storage({ token: getAccessToken() })
+}
+
+const storageClient = makeStorageClient();
 
 const Highlighter = () => {
   const [selectvalue, setSelectValue] = useState("");
@@ -55,13 +65,15 @@ const Highlighter = () => {
           }
         );
         files.push(file);
-        // const cid = await storage.put(files);
-        await getCid();
-        if (ipfsHash) {
+        const cid = await storage.put(files);
+        // await getCid();
+        if (cid) {
           setIsIpfsHashCreated(true);
           console.log("enters if ipfsHash condition...")
-          // setIpfsHash(cid);
-          // setUploading(false);
+          setIpfsHash(cid);
+          setUploading(false);
+          console.log(`IPFS CID: ${cid}`)
+          console.log(`Gateway URL: https://dweb.link/ipfs/${cid}`)
         }
       } catch (err) {
           console.log(err);
@@ -128,7 +140,7 @@ const Highlighter = () => {
       <div className="h-full w-1/2 flex pt-14 flex-col px-6 text-center">
 
         {/* form container here */}
-        <label class="block flex tracking-wide text-gray-700 text-md mb-2" for="snippet-language-select">
+        <label className="block flex tracking-wide text-gray-700 text-md mb-2" for="snippet-language-select">
           Select a language to generate syntax highlighting for your Paste
         </label>
         <select
@@ -157,7 +169,7 @@ const Highlighter = () => {
         <form className="w-full max-w flex">
           <div className="flex mb-6">
             <div className="w-full md:w-3/4 flex">
-              <label class="block flex tracking-wide text-gray-700 text-md mb-2" for="inline-file-name">
+              <label className="block flex tracking-wide text-gray-700 text-md mb-2" for="inline-file-name">
                 Enter a name for your Paste (Optional)
               </label>
               <input
@@ -202,13 +214,11 @@ const Highlighter = () => {
                 className="inline-flex "
                 style={{justifyContent: "flex-start"}}
               >
-                <a className="font-bold text-md text-blue-400 hover:text-blue-600"
-                  href="https://adybose.github.io"
-                  target="_blank"
-                  // view 
-                >
-                  {ipfsHash}
-                </a>
+                <Link href={'/snippets/' + ipfsHash} key={ipfsHash} target="_blank">
+                  <a className="font-bold text-md text-blue-400 hover:text-blue-600">
+                    <h4>{ipfsHash}</h4>
+                  </a>
+                </Link>
                 <span className="inline-flex">
                   <CopyToClipboard text={ipfsHash}>
                     <FaCopy
