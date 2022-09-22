@@ -27,7 +27,7 @@ const Viewer = props => {
   }, [props.cid])
 
   return (
-    <div className='flex justify-center h-screen'>
+    <div className='flex justify-center'>
       <AceEditor
         mode={selectedMode}
         theme='monokai'

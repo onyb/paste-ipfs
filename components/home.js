@@ -1,7 +1,4 @@
 import React from 'react'
-import { FaCopy } from 'react-icons/fa'
-import CopyToClipboard from 'react-copy-to-clipboard'
-import swal from 'sweetalert'
 import { v4 as uuid } from 'uuid'
 
 import '../styles/Home.module.css'
@@ -12,10 +9,7 @@ import axios from 'axios'
 const Home = () => {
   const [selectedMode, setSelectedMode] = React.useState('javascript')
   const [filename, setFileName] = React.useState('')
-  const [created, setCreated] = React.useState(false)
-  const [snippet, setSnippet] = React.useState('')
   const [uploading, setUploading] = React.useState(false)
-  const [ipfsHash, setIpfsHash] = React.useState('')
   const ace = React.useRef(undefined)
 
   const handleFileInput = e => {
@@ -25,7 +19,7 @@ const Home = () => {
   const extension = modes.find(mode => mode.value === selectedMode)?.extension ?? '.txt'
   const trimmedFilename = filename.replace(/\.[^/.]+$/, '')
 
-  const createSnippet = async () => {
+  const upload = async () => {
     setUploading(true)
     const value = ace.current.editor.getValue()
     const response = await axios.post(`/api/ipfs`, {
@@ -43,7 +37,7 @@ const Home = () => {
     const value = ace.current.editor.getValue()
     if (value) {
       const downloadElement = document.createElement('a')
-      const file = new Blob([snippet], {
+      const file = new Blob([value], {
         type: 'text/plain;charset=utf-8'
       })
 
@@ -55,58 +49,7 @@ const Home = () => {
   }
 
   return (
-    <div className=' container flex-col h-screen'>
-      <div className='w-full flex flex-col justify-center items-center'>
-        <div
-          className='w-full flex-col items-center'
-          style={{ visibility: created && snippet ? 'visible' : 'hidden' }}
-        >
-          <p
-            className='w-full items-center'
-            style={{ visibility: snippet && ipfsHash.length === 0 ? 'visible' : 'hidden' }}
-          >
-            🛸 Awesome! Your snippet is created and is being uploaded to IPFS. Please wait...
-          </p>
-          <p
-            className='items-center'
-            style={{ visibility: snippet && ipfsHash ? 'visible' : 'hidden' }}
-          >
-            🎉 <strong>Bravo! You have uploaded your snippet to IPFS.</strong>
-            <br />
-            Your CID is:
-          </p>
-          <div className='flex flex-wrap -mx-3 mb-2'>
-            <div
-              className='w-full md:w-2/5 px-3 mb-6 md:mb-0'
-              style={{ visibility: snippet && ipfsHash ? 'visible' : 'hidden' }}
-            >
-              <span className='inline-flex ' style={{ justifyContent: 'flex-start' }}>
-                <a
-                  className='font-bold text-md text-blue-400 hover:text-blue-600'
-                  href='https://adybose.github.io'
-                  target='_blank'
-                  rel='noreferrer'
-                  // view
-                >
-                  {ipfsHash}
-                </a>
-                <span className='inline-flex'>
-                  <CopyToClipboard text={ipfsHash}>
-                    <FaCopy
-                      size='1rem'
-                      onClick={() => {
-                        swal('IPFS hash copied successfully')
-                      }}
-                    />
-                  </CopyToClipboard>
-                </span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* New form */}
+    <div className='container flex-col'>
       <form className='w-full flex flex-col justify-center items-center'>
         <div className='flex flex-wrap -mx-3 mb-2 w-2/3 items-end'>
           <div className='lg:w-1/3 md:w-1/3 sm-w-full px-3 mb-6 md:mb-0'>
@@ -119,7 +62,6 @@ const Home = () => {
             <div className='relative'>
               <select
                 className='block appearance-none w-full bg-gray-200 border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-gray-100 focus:border-gray-400'
-                id='snippet-language-select'
                 onChange={e => setSelectedMode(e.target.value)}
                 value={selectedMode}
               >
@@ -149,28 +91,26 @@ const Home = () => {
             </label>
             <input
               className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-gray-100 focus:border-gray-400'
-              id='inline-file-name'
               type='text'
               value={filename}
               onChange={handleFileInput}
               placeholder='Enter a name for your Paste...'
-              autoComplete="off"
+              autoComplete='off'
             />
           </div>
           <div className='lg:w-1/4 md:w-1/3 sm:w-full px-3 mb-6 md:mb-0 flex items-end items-center'>
             <button
               className='shadow bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 focus:shadow-outline focus:outline-none text-white font-bold py-3 px-10 rounded'
               type='button'
-              id='createSnippetButton'
-              onClick={createSnippet}
+              onClick={upload}
             >
-              Create
+              {uploading ? 'Uploading...' : 'Create'}
             </button>
           </div>
         </div>
       </form>
 
-      <div className='flex justify-center h-screen'>
+      <div className='flex justify-center'>
         <AceEditor
           mode={selectedMode}
           theme='monokai'
