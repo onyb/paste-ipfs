@@ -6,6 +6,8 @@ import '../styles/Home.module.css'
 import modes from '../constants/modes'
 import AceEditor from './editor'
 
+const delay = time => new Promise(res => setTimeout(res, time))
+
 const Home = () => {
   const [selectedMode, setSelectedMode] = React.useState('javascript')
   const [filename, setFileName] = React.useState('')
@@ -36,6 +38,7 @@ const Home = () => {
     } catch (_) {
       await waitForUrl(url)
     }
+    await delay(5000)
   }
 
   const upload = async () => {
@@ -144,7 +147,7 @@ const Home = () => {
                   />
                 </svg>
               )}
-              {uploading ? (ipfsUrl ? 'Refreshing' : 'Uploading') : 'Create'}
+              {uploading ? (ipfsUrl ? 'Waiting' : 'Uploading') : 'Create'}
             </button>
           </div>
         </div>
