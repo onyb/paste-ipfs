@@ -22,7 +22,6 @@ export default async (req, res) => {
     }
   } else if (method === 'GET') {
     const { cid } = query
-    console.log(cid)
 
     try {
       const response = await client.get(cid)

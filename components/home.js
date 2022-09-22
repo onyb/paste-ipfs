@@ -19,6 +19,15 @@ const Home = () => {
   const extension = modes.find(mode => mode.value === selectedMode)?.extension ?? '.txt'
   const trimmedFilename = filename.replace(/\.[^/.]+$/, '')
 
+  React.useEffect(() => {
+    const inferredExtension = filename.split('.').pop()
+    const mode = modes.find(mode => mode.extension === `.${inferredExtension}`)
+
+    if (mode) {
+      setSelectedMode(mode.value)
+    }
+  }, [filename])
+
   const upload = async () => {
     setUploading(true)
     const value = ace.current.editor.getValue()
@@ -27,9 +36,8 @@ const Home = () => {
       filename: trimmedFilename || uuid().slice(0, 8),
       extension
     })
-    setUploading(false)
     if (response.status === 200) {
-      window.location.href = `/api/ipfs?cid=${response.data.cid}`
+      window.location.href = `/${response.data.cid}`
     }
   }
 
@@ -103,6 +111,7 @@ const Home = () => {
               className='shadow bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 focus:shadow-outline focus:outline-none text-white font-bold py-3 px-10 rounded'
               type='button'
               onClick={upload}
+              disabled={uploading}
             >
               {uploading ? 'Uploading...' : 'Create'}
             </button>
