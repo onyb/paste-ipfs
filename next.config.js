@@ -1,10 +1,10 @@
 /** @type {import('next').NextConfig} */
 
-const withTM = require('next-transpile-modules')(['react-syntax-highlighter']);
+// const withTM = require('next-transpile-modules')(['react-syntax-highlighter']);
 
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 }
 
-module.exports = withTM(nextConfig);
+module.exports = nextConfig;

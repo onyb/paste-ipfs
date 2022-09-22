@@ -9,14 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "axios": "^0.27.2",
+    "brace": "^0.11.1",
     "next": "12.3.0",
-    "next-transpile-modules": "^9.0.0",
     "react": "18.2.0",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.4.0",
-    "react-syntax-highlighter": "^15.5.0",
-    "sweetalert": "^2.1.2"
+    "sweetalert": "^2.1.2",
+    "uuid": "^9.0.0",
+    "web3.storage": "^4.4.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.11",
