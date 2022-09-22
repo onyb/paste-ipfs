@@ -18,7 +18,7 @@ const handler = async (req, res) => {
       res.status(200).json({ cid })
     } catch (e) {
       console.error(e)
-      res.status(500)
+      res.status(500).json({ error: e })
     }
   } else if (method === 'GET') {
     const { cid } = query
@@ -27,7 +27,7 @@ const handler = async (req, res) => {
       const response = await client.get(cid)
       if (!response.ok) {
         console.error(response.statusText)
-        res.status(500)
+        res.status(500).json({ response })
         return
       }
 
@@ -43,7 +43,7 @@ const handler = async (req, res) => {
       })
     } catch (e) {
       console.error(e)
-      res.status(500)
+      res.status(500).json({ error: e })
     }
   }
 }
