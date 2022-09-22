@@ -33,18 +33,13 @@ const handler = async (req, res) => {
 
       const files = await response.files()
       const file = files[0] // We always upload only one file
-      try {
-        const content = await axios.get(`https://${file.cid}.ipfs.w3s.link`)
-        res.status(200).json({
-          name: file.name,
-          content: content.data,
-          fileCid: file.cid,
-          rootCid: cid,
-          url: `https://${file.cid}.ipfs.w3s.link`
-        })
-      } catch (e) {
-        res.status(500).json({ error: e })
-      }
+      res.status(200).json({
+        name: file.name,
+        // content: content.data,
+        fileCid: file.cid,
+        rootCid: cid,
+        url: `https://${file.cid}.ipfs.w3s.link`
+      })
     } catch (e) {
       console.error(e)
       res.status(500).json({ error: e })

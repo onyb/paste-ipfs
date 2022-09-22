@@ -18,18 +18,17 @@ const Viewer = props => {
       return
     }
 
-    axios
-      .get(`/api/ipfs?cid=${props.cid}`)
-      .then(response => {
-        console.log('Received response:', response)
-        const { name, content: data, url } = response.data
-        const extension = name.split('.').pop()
-        const mode = modes.find(mode => mode.extension === `.${extension}`)?.value ?? 'javascript'
-        setSelectedMode(mode)
-        setTimeout(() => setContent(data), 2000)
-        setRawUrl(url)
-      })
-      .catch(e => console.error(e))
+    ;(async () => {
+      const response = await axios.get(`/api/ipfs?cid=${props.cid}`)
+      const { name, url } = response.data
+      const extension = name.split('.').pop()
+      const mode = modes.find(mode => mode.extension === `.${extension}`)?.value ?? 'javascript'
+      setSelectedMode(mode)
+      setRawUrl(url)
+
+      const content = await axios.get(url)
+      setTimeout(() => setContent(content.data), 1200)
+    })()
   }, [props.cid])
 
   return (
