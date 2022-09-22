@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
 
-import Footer from '../components/Footer'
+import Footer from '../components/footer'
 import styles from '../styles/Home.module.css'
 
 const HomeComponent = dynamic(import('../components/home'), { ssr: false })
