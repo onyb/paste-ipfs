@@ -8,27 +8,29 @@ import modes from '../constants/modes'
 import AceEditor from './editor'
 import axios from 'axios'
 
-const Highlighter = () => {
+const Home = () => {
   const [selectedMode, setSelectedMode] = React.useState('javascript')
   const [filename, setFileName] = React.useState('')
   const [created, setCreated] = React.useState(false)
   const [snippet, setSnippet] = React.useState('')
   const [uploading, setUploading] = React.useState(false)
   const [ipfsHash, setIpfsHash] = React.useState('')
-  const [isIpfsHashCreated, setIsIpfsHashCreated] = React.useState(false)
   const ace = React.useRef(undefined)
 
   const handleFileInput = e => {
     setFileName(e.target.value)
   }
 
+  const extension = modes.find(mode => mode.value === selectedMode)?.extension ?? '.txt'
+  const trimmedFilename = filename.replace(/\.[^/.]+$/, '')
+
   const createSnippet = async () => {
     setUploading(true)
     const value = ace.current.editor.getValue()
     const response = await axios.post(`/api/ipfs`, {
       content: value,
-      filename: filename.replace(/\.[^/.]+$/, ''),
-      extension: modes.find(mode => mode.value === selectedMode)?.extension ?? '.txt'
+      filename: trimmedFilename,
+      extension
     })
     setUploading(false)
     if (response.status === 200) {
@@ -36,17 +38,16 @@ const Highlighter = () => {
     }
   }
 
-  function downloadSnippetAsFile (e) {
-    e.preventDefault()
-    console.log('You clicked on download snippet button.')
-    if (created && snippet) {
+  function downloadSnippetAsFile () {
+    const value = ace.current.editor.getValue()
+    if (value) {
       const downloadElement = document.createElement('a')
       const file = new Blob([snippet], {
         type: 'text/plain;charset=utf-8'
       })
 
       downloadElement.href = URL.createObjectURL(file)
-      downloadElement.download = 'new_paste.txt'
+      downloadElement.download = `${trimmedFilename}${extension}`
       document.body.appendChild(downloadElement)
       downloadElement.click()
     }
@@ -180,4 +181,4 @@ const Highlighter = () => {
   )
 }
 
-export default Highlighter
+export default Home
