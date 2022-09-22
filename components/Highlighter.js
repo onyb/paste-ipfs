@@ -6,10 +6,10 @@ import swal from 'sweetalert'
 import '../styles/Home.module.css'
 import modes from '../constants/modes'
 import AceEditor from './editor'
+import axios from 'axios'
 
 const Highlighter = () => {
   const [selectedMode, setSelectedMode] = React.useState('javascript')
-  const [textfield, setTextField] = React.useState('')
   const [filename, setFileName] = React.useState('')
   const [active, setActive] = React.useState(false)
   const [created, setCreated] = React.useState(false)
@@ -68,41 +68,20 @@ const Highlighter = () => {
     upload()
   }
 
-  const handleInputChange = code => {
-    setTextField(code)
-    let buttonText = document.getElementById('createSnippetButton')
-    buttonText.innerHTML = 'Create'
-    // if (e.target.value.length === 0 || e.target.value.length !== snippet.length) {
-    //   setCreated(false);
-    // }
-    // if (e.target.value.length === 0) {
-    //   setCreated(false);
-    // }
-  }
-
-  const handleSelect = e => {
-    setSelectValue(e.target.value.toLowerCase())
-    let buttonText = document.getElementById('createSnippetButton')
-    buttonText.innerHTML = 'Create'
-  }
-
   const handleFileInput = e => {
     setFileName(e.target.value)
   }
 
-  function createSnippet (e) {
-    e.preventDefault()
-    console.log('You clicked create snippet.')
-    setSnippet(textfield)
-    setActive(false)
-    let buttonText = document.getElementById('createSnippetButton')
-    buttonText.innerHTML = 'Created!'
-    setCreated(true)
-    setIsIpfsHashCreated(false)
-    setIpfsHash('')
-    // setUploading(false);
-    // let uploadButtonText = document.getElementById('uploadToIpfsButton')
-    // uploadButtonText.innerHTML = "+ Add to IPFS"
+  const createSnippet = async () => {
+    const value = ace.current.editor.getValue()
+    const response = await axios.post(`/api/ipfs`, {
+      content: value,
+      filename: filename.replace(/\.[^/.]+$/, ''),
+      extension: modes.find(mode => mode.value === selectedMode)?.extension ?? '.txt'
+    })
+    if (response.status === 200) {
+      window.location.href = `/api/ipfs?cid=${response.data.cid}`
+    }
   }
 
   function downloadSnippetAsFile (e) {
@@ -179,7 +158,7 @@ const Highlighter = () => {
           <div className='lg:w-1/3 md:w-1/3 sm-w-full px-3 mb-6 md:mb-0'>
             <label
               className='block tracking-wide text-gray-700 text-xs font-bold mb-2'
-              for='snippet-language-select'
+              htmlFor='snippet-language-select'
             >
               Select Language of your Paste
             </label>
@@ -228,8 +207,6 @@ const Highlighter = () => {
               className='shadow bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 focus:shadow-outline focus:outline-none text-white font-bold py-3 px-10 rounded'
               type='button'
               id='createSnippetButton'
-              value=''
-              disabled={!active}
               onClick={createSnippet}
             >
               Create

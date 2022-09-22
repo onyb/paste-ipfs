@@ -6,28 +6,37 @@ if (typeof window !== 'undefined') {
 }
 
 class AceEditor extends React.Component {
-  initialize () {
+  initialize (props) {
     if (typeof window !== 'undefined') {
-      const { onChange, setReadOnly, setValue, theme, mode } = this.props
+      const { onChange, setReadOnly, setValue, theme, mode, persist } = props
 
       require(`brace/mode/${mode}`)
       require(`brace/theme/${theme}`)
 
       const editor = ace.edit('ace-editor')
       this.editor = editor
+
       editor.getSession().setMode(`ace/mode/${mode}`)
       editor.setTheme(`ace/theme/${theme}`)
+      editor.setValue(persist ? editor.getValue() : setValue)
       editor.on('change', e => onChange(editor.getValue(), e))
       editor.setReadOnly(setReadOnly)
-      editor.setValue(setValue)
     }
   }
 
   componentDidMount () {
-    this.initialize()
+    this.initialize(this.props)
   }
+
   componentDidUpdate (prevProps, prevState, snapshot) {
-    this.initialize()
+    this.initialize(
+      this.props.mode !== prevProps.mode ? { ...this.props, persist: true } : this.props
+    )
+  }
+
+  // We will lose all state if component is
+  shouldComponentUpdate (nextProps, nextState, nextContext) {
+    return this.props.mode !== nextProps.mode
   }
 
   render () {
