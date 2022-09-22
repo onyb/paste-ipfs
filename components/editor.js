@@ -29,14 +29,22 @@ class AceEditor extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
-    this.initialize(
-      this.props.mode !== prevProps.mode ? { ...this.props, persist: true } : this.props
-    )
+    if (this.props.setValue !== prevProps.setValue) {
+      this.initialize(this.props)
+      return
+    }
+
+    if (this.props.mode !== prevProps.mode) {
+      this.initialize({ ...this.props, persist: true })
+      return
+    }
+
+    this.initialize(this.props)
   }
 
   // We will lose all state if component is
   shouldComponentUpdate (nextProps, nextState, nextContext) {
-    return this.props.mode !== nextProps.mode
+    return this.props.mode !== nextProps.mode || this.props.setValue !== nextProps.setValue
   }
 
   render () {

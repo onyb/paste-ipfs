@@ -11,7 +11,6 @@ import axios from 'axios'
 const Highlighter = () => {
   const [selectedMode, setSelectedMode] = React.useState('javascript')
   const [filename, setFileName] = React.useState('')
-  const [active, setActive] = React.useState(false)
   const [created, setCreated] = React.useState(false)
   const [snippet, setSnippet] = React.useState('')
   const [uploading, setUploading] = React.useState(false)
@@ -19,66 +18,19 @@ const Highlighter = () => {
   const [isIpfsHashCreated, setIsIpfsHashCreated] = React.useState(false)
   const ace = React.useRef(undefined)
 
-  const validate = () => {
-    return textfield.length
-  }
-
-  React.useEffect(() => {
-    const active = validate()
-    setActive(active)
-  }, [textfield])
-
-  const getCid = () => {
-    setTimeout(() => {
-      setIpfsHash('a-pretty-long-hash')
-      setUploading(false)
-      // let buttonText = document.getElementById('uploadToIpfsButton');
-      // buttonText.innerHTML = "+ Add to IPFS";
-    }, 5000)
-  }
-
-  function uploadToIpfs (e) {
-    e.preventDefault()
-    console.log('Uploading to IPFS...')
-    setUploading(true)
-    setActive(false)
-    let buttonText = document.getElementById('uploadToIpfsButton')
-    buttonText.innerHTML = 'Adding to IPFS...'
-
-    async function upload () {
-      try {
-        // const storage = new Web3Storage({token})
-        const files = []
-        const file = new Blob([snippet], {
-          type: 'text/plain;charset=utf-8'
-        })
-        files.push(file)
-        // const cid = await storage.put(files);
-        await getCid()
-        if (ipfsHash) {
-          setIsIpfsHashCreated(true)
-          console.log('enters if ipfsHash condition...')
-          // setIpfsHash(cid);
-          // setUploading(false);
-        }
-      } catch (err) {
-        console.log(err)
-      }
-    }
-    upload()
-  }
-
   const handleFileInput = e => {
     setFileName(e.target.value)
   }
 
   const createSnippet = async () => {
+    setUploading(true)
     const value = ace.current.editor.getValue()
     const response = await axios.post(`/api/ipfs`, {
       content: value,
       filename: filename.replace(/\.[^/.]+$/, ''),
       extension: modes.find(mode => mode.value === selectedMode)?.extension ?? '.txt'
     })
+    setUploading(false)
     if (response.status === 200) {
       window.location.href = `/api/ipfs?cid=${response.data.cid}`
     }
