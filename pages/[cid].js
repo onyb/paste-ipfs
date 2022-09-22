@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
+import dynamic from 'next/dynamic'
 
-import Viewer from '../components/viewer'
+const Viewer = dynamic(import('../components/viewer'), { ssr: false })
 
 export default function ViewCID () {
   const router = useRouter()
