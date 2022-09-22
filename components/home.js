@@ -10,6 +10,7 @@ const Home = () => {
   const [selectedMode, setSelectedMode] = React.useState('javascript')
   const [filename, setFileName] = React.useState('')
   const [uploading, setUploading] = React.useState(false)
+  const [ipfsUrl, setIpfsUrl] = React.useState('')
   const ace = React.useRef(undefined)
 
   const handleFileInput = e => {
@@ -28,6 +29,15 @@ const Home = () => {
     }
   }, [filename])
 
+  const waitForUrl = async url => {
+    try {
+      console.log('Waiting for IPFS CID discovery: ', url)
+      await axios.get(url)
+    } catch (_) {
+      await waitForUrl(url)
+    }
+  }
+
   const upload = async () => {
     setUploading(true)
     const value = ace.current.editor.getValue()
@@ -36,9 +46,12 @@ const Home = () => {
       filename: trimmedFilename || uuid().slice(0, 8),
       extension
     })
-    if (response.status === 200) {
-      window.location.href = `/${response.data.cid}`
-    }
+
+    const gatewayUrl = `https://${response.data.cid}.ipfs.w3s.link`
+    setIpfsUrl(gatewayUrl)
+
+    await waitForUrl(gatewayUrl)
+    window.location.href = `/${response.data.cid}`
   }
 
   function downloadSnippetAsFile () {
@@ -131,7 +144,7 @@ const Home = () => {
                   />
                 </svg>
               )}
-              {uploading ? 'Uploading' : 'Create'}
+              {uploading ? (ipfsUrl ? 'Refreshing' : 'Uploading') : 'Create'}
             </button>
           </div>
         </div>

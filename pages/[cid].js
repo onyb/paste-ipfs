@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import Link from 'next/link'
 
-import Footer from '../components/footer'
 import styles from '../styles/Home.module.css'
 const Viewer = dynamic(import('../components/viewer'), { ssr: false })
 
@@ -15,7 +14,7 @@ export default function ViewCID () {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Paste@IPFS</title>
+        <title>Paste IPFS</title>
         <meta name='description' content='Share code snippets on the Interplanetary Web' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
@@ -27,7 +26,6 @@ export default function ViewCID () {
           <h3 className={styles.description}>Your snippet powered by IPFS</h3>
         </div>
         <Viewer cid={cid} />
-        <Footer />
       </main>
     </div>
   )
