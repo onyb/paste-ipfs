@@ -154,6 +154,7 @@ const Home = () => {
               value={filename}
               onChange={handleFileInput}
               placeholder='Enter a name for your Paste...'
+              autoComplete="off"
             />
           </div>
           <div className='lg:w-1/4 md:w-1/3 sm:w-full px-3 mb-6 md:mb-0 flex items-end items-center'>

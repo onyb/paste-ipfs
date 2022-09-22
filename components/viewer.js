@@ -3,6 +3,7 @@ import axios from 'axios'
 
 import AceEditor from './editor'
 import modes from '../constants/modes'
+import '../styles/viewer.module.css'
 
 const Viewer = props => {
   const [selectedMode, setSelectedMode] = React.useState('javascript')
