@@ -7,7 +7,7 @@ function makeFileObjects (content, filename) {
   return [new File([content], filename)]
 }
 
-export default async (req, res) => {
+const handler = async (req, res) => {
   const { method, query } = req
   if (method === 'POST') {
     const { content, filename, extension } = req.body
@@ -47,3 +47,5 @@ export default async (req, res) => {
     }
   }
 }
+
+export default handler
